@@ -1,0 +1,7 @@
+resources:
+- crossplane-configmap.yaml
+- crossplane-job.yaml
+- namespace.yaml
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization

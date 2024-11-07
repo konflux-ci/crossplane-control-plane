@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "Using Helm to install Crossplane on Kubernetes cluster..."
+helm repo add crossplane-stable https://charts.crossplane.io/stable
+helm repo update
+
+helm upgrade --install crossplane crossplane-stable/crossplane -n crossplane-system --create-namespace
+
+echo "Waiting for Crossplane to be ready"
+kubectl wait --for=condition=available --timeout=300s deployment/crossplane -n crossplane-system
+
+echo "Crossplane installed"
