@@ -13,7 +13,7 @@ kustomize build --enable-helm config/k8s | kubectl apply -f -
 To install on OpenShift use the config located in `config/ocp`:
 
 ```bash
-kustomize build --enable-helm config/k8s | kubectl apply -f -
+kustomize build --enable-helm config/ocp | kubectl apply -f -
 ```
 
 This installs crossplane version 1.18.0 and creates namespaces `crossplane-system` and
