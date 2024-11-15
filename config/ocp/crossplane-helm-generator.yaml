@@ -1,0 +1,10 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: crossplane
+name: crossplane
+repo: https://charts.crossplane.io/stable
+version: v1.18.0
+releaseName: crossplane
+namespace: crossplane-system
+valuesFile: crossplane-helm-values.yaml

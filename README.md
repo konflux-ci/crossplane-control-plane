@@ -3,17 +3,23 @@ This repository contains all the config files needed for installing crossplane.
 
 # Installation
 Here we have used Kustomization's Helm Chart Inflation Generator to install crossplane.
-To install locally, use the below command:
+
+To install on kubernetes use the config located in `config/k8s`:
 
 ```bash
-cd config
-kustomize build --enable-helm | kubectl apply -f -
+kustomize build --enable-helm config/k8s | kubectl apply -f -
 ```
 
-This installs crossplane version 1.18.0 and creates namespaces crossplane-system and
-crossplane-connections.
+To install on OpenShift use the config located in `config/ocp`:
 
-# Note
+```bash
+kustomize build --enable-helm config/k8s | kubectl apply -f -
+```
+
+This installs crossplane version 1.18.0 and creates namespaces `crossplane-system` and
+`crossplane-connections`.
+
+> **_Note_:**
 If you are using kind cluster then you need to pull the crossplane image locally first
 and then load the image into the kind cluster
 
