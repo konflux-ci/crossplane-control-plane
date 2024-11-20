@@ -5,3 +5,7 @@ securityContextCrossplane:
 securityContextRBACManager:
   runAsUser: null
   runAsGroup: null
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
