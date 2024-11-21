@@ -1,7 +1,14 @@
 ---
 securityContextCrossplane:
+  runAsNonRoot: true
   runAsUser: null
   runAsGroup: null
+
 securityContextRBACManager:
+  runAsNonRoot: true
   runAsUser: null
   runAsGroup: null
+
+customAnnotations:
+  ignore-check.kube-linter.io/env-var-secret: >-
+    The env variables only contain the name of Secrets to be mounted
