@@ -6,3 +6,6 @@ generators:
 
 resources:
   - ../base
+
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-1"
