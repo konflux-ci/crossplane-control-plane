@@ -1,0 +1,23 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xnamespaces.eaas.konflux-ci.dev
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  group: eaas.konflux-ci.dev
+  names:
+    kind: XNamespace
+    plural: xnamespaces
+  claimNames:
+    kind: Namespace
+    plural: namespaces
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties: {}
