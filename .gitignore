@@ -1,2 +1,2 @@
-config/k8s/charts/
-config/ocp/charts/
+crossplane/k8s/charts/
+crossplane/ocp/charts/

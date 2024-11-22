@@ -1,8 +1,16 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-generators:
-  - crossplane-helm-generator.yaml
-
 resources:
   - ../base
+  - deployment-runtime-configs.yaml
+
+patches:
+  - patch: |
+      - op: add
+        path: /spec/runtimeConfigRef
+        value:
+          name: function-runtime-config
+    target:
+      kind: Function
+      group: pkg.crossplane.io/v1

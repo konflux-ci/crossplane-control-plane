@@ -1,0 +1,19 @@
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: function-runtime-config
+spec:
+  deploymentTemplate:
+    spec:
+      selector: {}
+      template:
+        spec:
+          securityContext:
+            runAsUser: null
+            runAsGroup: null
+          containers:
+            - name: package-runtime
+              securityContext:
+                runAsUser: null
+                runAsGroup: null
