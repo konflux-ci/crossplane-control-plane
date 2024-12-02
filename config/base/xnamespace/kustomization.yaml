@@ -1,0 +1,15 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - xrd.yaml
+  - composition.yaml
+configMapGenerator:
+  - name: xnamespace-templates
+    namespace: crossplane-system
+    files:
+      - templates/ns.yaml
+      - templates/sa-rbac.yaml
+      - templates/sa-token.yaml
+generatorOptions:
+  disableNameSuffixHash: true

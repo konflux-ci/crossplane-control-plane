@@ -3,3 +3,14 @@ kind: Kustomization
 
 resources:
   - ../base
+  - deployment-runtime-configs.yaml
+
+patches:
+  - patch: |
+      - op: add
+        path: /spec/runtimeConfigRef
+        value:
+          name: function-runtime-config
+    target:
+      kind: Function
+      group: pkg.crossplane.io

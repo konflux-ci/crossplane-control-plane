@@ -11,11 +11,13 @@ spec:
       selector: {}
       template:
         spec:
-          securityContext:
-            runAsUser: null
-            runAsGroup: null
           containers:
             - name: package-runtime
-              securityContext:
-                runAsUser: null
-                runAsGroup: null
+              volumeMounts:
+                - mountPath: /templates/xnamespace
+                  name: xnamespace-templates
+                  readOnly: true
+          volumes:
+            - name: xnamespace-templates
+              configMap:
+                name: xnamespace-templates

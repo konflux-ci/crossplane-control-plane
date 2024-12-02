@@ -1,0 +1,86 @@
+---
+apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
+kind: ExtraResources
+requirements:
+  providerConfig:
+    apiVersion: kubernetes.crossplane.io/v1alpha1
+    kind: ProviderConfig
+    matchName: eaas-kubernetes-provider-config
+
+---
+# Get the secret ref from the ProviderConfig
+{{- $extra := .extraResources.providerConfig.items | default (list dict) }}
+{{- $fromSecret := (first $extra).resource.spec.credentials.secretRef | default dict }}
+
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: secret
+spec:
+  references:
+    # Copy the API server address from the ProviderConfig secret to the remote secret so
+    # it's available when constructing the kubeconfig.
+    - patchesFrom:
+        apiVersion: v1
+        kind: Secret
+        name: {{ $fromSecret.name }}
+        namespace: {{ $fromSecret.namespace }}
+        fieldPath: data.apiserver
+  forProvider:
+    manifest:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: {{ .context.serviceaccount }}
+        namespace: {{ .context.namespace }}
+        annotations:
+          kubernetes.io/service-account.name: {{ .context.serviceaccount }}
+      type: kubernetes.io/service-account-token
+  connectionDetails:
+    - apiVersion: v1
+      kind: Secret
+      name: {{ .context.serviceaccount }}
+      namespace: {{ .context.namespace }}
+      fieldPath: data.token
+      toConnectionSecretKey: token
+    - apiVersion: v1
+      kind: Secret
+      name: {{ .context.serviceaccount }}
+      namespace: {{ .context.namespace }}
+      fieldPath: data.apiserver
+      toConnectionSecretKey: apiserver
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
+  writeConnectionSecretToRef:
+    name: {{ .observed.composite.resource.metadata.name }}
+    namespace: crossplane-connections
+
+---
+{{- $token := .observed.resources.secret.connectionDetails.token | default "" | b64dec }}
+{{- $apiserver := .observed.resources.secret.connectionDetails.apiserver | default "" | b64dec }}
+
+apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
+kind: Context
+data:
+  token: {{ $token }}
+  apiserver: {{ $apiserver }}
+  kubeconfig: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+      - name: eaas-cluster
+        cluster:
+          server: {{ $apiserver }}
+    contexts:
+      - context:
+          cluster: eaas-cluster
+          namespace: {{ .context.namespace }}
+          user: {{ .context.serviceaccount }}
+        name: default
+    users:
+      - name: {{ .context.serviceaccount }}
+        user:
+          token: {{ $token }}
+    current-context: default
+    preferences: {}

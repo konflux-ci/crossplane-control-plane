@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - crossplane-connections-namespace.yaml
   - functions.yaml
-  - namespace-xrd.yaml
+  - xnamespace/
