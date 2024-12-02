@@ -13,4 +13,4 @@ patches:
           name: function-runtime-config
     target:
       kind: Function
-      group: pkg.crossplane.io/v1
+      group: pkg.crossplane.io
