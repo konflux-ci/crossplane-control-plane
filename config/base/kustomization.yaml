@@ -5,3 +5,5 @@ resources:
   - crossplane-connections-namespace.yaml
   - functions.yaml
   - xnamespace/
+  - provider.yaml
+  - provider-deployment-runtime-config.yaml
