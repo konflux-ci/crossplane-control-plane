@@ -64,3 +64,25 @@ kubectl apply -k config/ocp
 
 TARGET=ocp ./cleanup.sh # Cleanup for ocp
 ```
+
+# CompositeResourceDefinitions (XRDs)
+
+## xnamespaces.eaas.konflux-ci.dev
+
+Provides a kubernetes namespace for deploying and testing software.
+
+### Prerequisites
+
+- Crossplane Kubernetes `Provider` installed (not currently included)
+- A `ProviderConfig` named `eaas-kubernetes-provider-config` referencing a secret with the keys:
+  - `apiserver`: The URL of the kubernetes API server
+  - `kubeconfig`: A valid kubeconfig for authenticating to the cluster
+- The permissions associated with the kubeconfig must allow for full control of:
+    - `Namespaces`
+    - `Secrets`
+    - `ServiceAccounts`
+    - `RoleBindings`
+
+### Usage
+
+See the [examples](./examples/xnamespace/).

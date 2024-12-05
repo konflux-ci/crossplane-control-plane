@@ -1,0 +1,8 @@
+---
+apiVersion: eaas.konflux-ci.dev/v1alpha1
+kind: Namespace
+metadata:
+  name: my-namespace
+spec:
+  writeConnectionSecretToRef:
+    name: my-claim-secret

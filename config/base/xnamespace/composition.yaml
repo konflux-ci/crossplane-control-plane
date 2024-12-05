@@ -1,0 +1,66 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: eaas-namespace
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  writeConnectionSecretsToNamespace: crossplane-connections
+  compositeTypeRef:
+    apiVersion: eaas.konflux-ci.dev/v1alpha1
+    kind: XNamespace
+  mode: Pipeline
+  pipeline:
+    - step: create-namespace
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: FileSystem
+        fileSystem:
+          dirPath: /templates/xnamespace/ns.yaml
+
+    - step: create-serviceaccount
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: FileSystem
+        fileSystem:
+          dirPath: /templates/xnamespace/sa-rbac.yaml
+
+    - step: create-serviceaccount-token
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: FileSystem
+        fileSystem:
+          dirPath: /templates/xnamespace/sa-token.yaml
+
+    - step: create-connection-details
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            ---
+            apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
+            kind: CompositeConnectionDetails
+            data:
+              namespace: {{ .context.namespace | default "" | b64enc }}
+              serviceaccount: {{ .context.serviceaccount | default "" | b64enc }}
+              kubeconfig: {{ .context.kubeconfig | default "" | b64enc }}
+              token: {{ .context.token | default "" | b64enc }}
+              apiserver: {{ .context.apiserver | default "" | b64enc }}
+
+    - step: auto-detect-ready-composed-resources
+      functionRef:
+        name: function-auto-ready

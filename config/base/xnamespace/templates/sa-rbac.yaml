@@ -1,0 +1,47 @@
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: serviceaccount
+spec:
+  forProvider:
+    manifest:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: namespace-manager
+        namespace: {{ .context.namespace }}
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
+
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: rolebinding
+spec:
+  forProvider:
+    manifest:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: namespace-manager-rb
+        namespace: {{ .context.namespace }}
+      subjects:
+        - kind: ServiceAccount
+          name: namespace-manager
+          namespace: {{ .context.namespace }}
+      roleRef:
+        kind: ClusterRole
+        name: edit
+        apiGroup: rbac.authorization.k8s.io
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
+
+---
+apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
+kind: Context
+data:
+  serviceaccount: {{ .observed.resources.serviceaccount.resource.spec.forProvider.manifest.metadata.name }}
