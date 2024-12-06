@@ -9,6 +9,7 @@ configMapGenerator:
     namespace: crossplane-system
     files:
       - templates/ns.yaml
+      - templates/ns-policy.yaml
       - templates/sa-rbac.yaml
       - templates/sa-token.yaml
 generatorOptions:
