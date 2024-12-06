@@ -22,6 +22,16 @@ spec:
         fileSystem:
           dirPath: /templates/xnamespace/ns.yaml
 
+    - step: create-namespace-policies
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: FileSystem
+        fileSystem:
+          dirPath: /templates/xnamespace/ns-policy.yaml
+
     - step: create-serviceaccount
       functionRef:
         name: function-go-templating

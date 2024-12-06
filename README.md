@@ -78,10 +78,13 @@ Provides a kubernetes namespace for deploying and testing software.
   - `apiserver`: The URL of the kubernetes API server
   - `kubeconfig`: A valid kubeconfig for authenticating to the cluster
 - The permissions associated with the kubeconfig must allow for full control of:
+    - `LimitRanges`
     - `Namespaces`
+    - `NetworkPolicies`
+    - `ResourceQuotas`
+    - `RoleBindings`
     - `Secrets`
     - `ServiceAccounts`
-    - `RoleBindings`
 
 ### Usage
 

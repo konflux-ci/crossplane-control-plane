@@ -1,0 +1,181 @@
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: quota
+spec:
+  forProvider:
+    manifest:
+      apiVersion: v1
+      kind: ResourceQuota
+      metadata:
+        name: quota
+        namespace: {{ .context.namespace }}
+      spec:
+        hard:
+          # storage
+          requests.storage: 50Gi
+          requests.ephemeral-storage: 50Gi
+          limits.ephemeral-storage: 50Gi
+          count/persistentvolumeclaims: "12"
+          # workloads
+          count/deployments.apps: "30"
+          count/deploymentconfigs.apps: "30"
+          count/daemonsets.apps: "30"
+          count/statefulsets.apps: "30"
+          count/replicasets.apps: "30"
+          count/replicationcontrollers: "30"
+          count/jobs.batch: "30"
+          count/cronjobs.batch: "30"
+          count/pods: "150"
+          count/configmaps: "100"
+          count/secrets: "100"
+          # networking
+          count/services: "30"
+          count/ingresses.extensions: "0"
+          count/routes.route.openshift.io: "0"
+          # builds
+          count/buildconfigs.build.openshift.io: "0"
+          # other
+          count/clustertemplateinstances.clustertemplate.openshift.io: "5"
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
+
+---
+# Quotas and default limits for not-terminating containers (long-running containers)
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: quota-not-terminating
+spec:
+  forProvider:
+    manifest:
+      apiVersion: v1
+      kind: ResourceQuota
+      metadata:
+        name: quota-not-terminating
+        namespace: {{ .context.namespace }}
+      spec:
+        scopes:
+          - NotTerminating
+        hard:
+          requests.cpu: 1750m
+          requests.memory: 32Gi
+          limits.cpu: "20"
+          limits.memory: 32Gi
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
+
+---
+# Don't allow terminating (short-lived) containers (like builds)
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: quota-terminating
+spec:
+  forProvider:
+    manifest:
+      apiVersion: v1
+      kind: ResourceQuota
+      metadata:
+        name: quota-terminating
+        namespace: {{ .context.namespace }}
+      spec:
+        scopes:
+          - Terminating
+        hard:
+          cpu: 0
+          memory: 0
+          pods: 0
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
+
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: resource-limits
+spec:
+  forProvider:
+    manifest:
+      apiVersion: v1
+      kind: LimitRange
+      metadata:
+        name: resource-limits
+        namespace: {{ .context.namespace }}
+      spec:
+        limits:
+          - type: Container
+            default:
+              cpu: 2000m
+              memory: 2Gi
+            defaultRequest:
+              cpu: 10m
+              memory: 256Mi
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
+
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: allow-same-namespace
+spec:
+  forProvider:
+    manifest:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-same-namespace
+        namespace: {{ .context.namespace }}
+      spec:
+        podSelector: {}
+        ingress:
+          - from:
+            - podSelector: {}
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
+
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    gotemplating.fn.crossplane.io/composition-resource-name: allow-from-openshift
+spec:
+  forProvider:
+    manifest:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-from-openshift
+        namespace: {{ .context.namespace }}
+      spec:
+        ingress:
+          - from:
+            # OpenShift console
+            - namespaceSelector:
+                matchLabels:
+                  network.openshift.io/policy-group: console
+            # OpenShift monitoring
+            - namespaceSelector:
+                matchLabels:
+                  network.openshift.io/policy-group: monitoring
+            # OpenShift ingress
+            - namespaceSelector:
+                matchLabels:
+                  network.openshift.io/policy-group: ingress
+            # OLM namespaces
+            - namespaceSelector:
+                matchLabels:
+                  openshift.io/scc: anyuid
+        podSelector: {}
+        policyTypes:
+          - Ingress
+  providerConfigRef:
+    name: eaas-kubernetes-provider-config
