@@ -22,10 +22,8 @@ jobs:
         shell: bash
         run: |
           mkdir manifests
-          kustomize build --enable-helm crossplane/k8s > manifests/crossplane-k8s.yaml
-          kustomize build --enable-helm crossplane/ocp > manifests/crossplane-ocp.yaml
-          kustomize build config/k8s > manifests/config-k8s.yaml
-          kustomize build config/ocp > manifests/config-ocp.yaml
+          kustomize build --enable-helm crossplane/ > manifests/crossplane.yaml
+          kustomize build config/ > manifests/config.yaml
 
       # This prepares directory where github/codeql-action/upload-sarif@v1 looks up report files by default.
       - name: Create results directory for SARIF report files

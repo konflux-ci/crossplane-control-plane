@@ -1,4 +1,0 @@
----
-customAnnotations:
-  ignore-check.kube-linter.io/env-var-secret: >-
-    The env variables only contain the name of Secrets to be mounted
