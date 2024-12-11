@@ -1,4 +1,11 @@
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: provider-kubernetes
+  namespace: crossplane-system
+
+---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
@@ -23,6 +30,7 @@ spec:
       selector: {}
       template:
         spec:
+          serviceAccountName: provider-kubernetes
           securityContext:
             runAsUser: null
             runAsGroup: null

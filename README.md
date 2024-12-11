@@ -56,7 +56,7 @@ Provides a kubernetes namespace for deploying and testing software.
 - A `ProviderConfig` named `eaas-kubernetes-provider-config` referencing a secret with the keys:
   - `apiserver`: The URL of the kubernetes API server
   - `kubeconfig`: A valid kubeconfig for authenticating to the cluster
-- The permissions associated with the kubeconfig must allow for full control of:
+- The account associated with the kubeconfig must be granted full control of:
     - `LimitRanges`
     - `Namespaces`
     - `NetworkPolicies`
@@ -64,6 +64,14 @@ Provides a kubernetes namespace for deploying and testing software.
     - `RoleBindings`
     - `Secrets`
     - `ServiceAccounts`
+- The account must also be granted the `edit` ClusterRole.
+
+All of this is configured in an example which sets up the kubernetes provider
+to interact with the local cluster.
+
+```bash
+kubectl apply -k examples/provider-kubernetes-in-cluster
+```
 
 ### Usage
 

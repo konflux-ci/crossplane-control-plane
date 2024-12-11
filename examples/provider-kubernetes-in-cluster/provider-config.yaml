@@ -1,0 +1,27 @@
+---
+apiVersion: kubernetes.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: eaas-kubernetes-provider-config
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  credentials:
+    source: InjectedIdentity
+    # Hack: even though InjectedIdentity is the source, the XNamespace composition expects this
+    # secretRef to exist.
+    secretRef:
+      name: provider-kubernetes-in-cluster
+      namespace: crossplane-system
+      key: kubeconfig
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: provider-kubernetes-in-cluster
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  apiserver: https://kubernetes.default
+  kubeconfig: ""
