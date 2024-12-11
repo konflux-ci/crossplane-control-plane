@@ -7,9 +7,7 @@ with Konflux.
 The quickest way to install everything is to run the `deploy.sh` script.
 
 ```bash
-./deploy.sh # Deploy to k8s
-
-TARGET=ocp ./deploy.sh # Deploy to ocp
+./deploy.sh
 ```
 
 This will install crossplane from a helm chart and then deploy our control plane
@@ -20,16 +18,8 @@ configuration.
 
 Here we have used Kustomization's Helm Chart Inflation Generator to install crossplane.
 
-To install on kubernetes use the manifests located in `crossplane/k8s`:
-
 ```bash
-kustomize build --enable-helm crossplane/k8s | kubectl apply -f -
-```
-
-To install on OpenShift use the manifests located in `crossplane/ocp`:
-
-```bash
-kustomize build --enable-helm crossplane/ocp | kubectl apply -f -
+kustomize build --enable-helm crossplane/ | kubectl apply -f -
 ```
 
 This installs crossplane version 1.18.0 in the `crossplane-system` namespace.
@@ -45,24 +35,14 @@ kind load docker-image crossplane/crossplane:v1.18.0 --name crossplane
 
 ## Control Plane Configuration
 
-To deploy the configs on kubernetes use the manifests located in `config/k8s`:
-
 ```bash
-kubectl apply -k config/k8s
-```
-
-To deploy the configs on OpenShift use the manifests located in `config/ocp`:
-
-```bash
-kubectl apply -k config/ocp
+kubectl apply -k config/
 ```
 
 # Cleanup
 
 ```bash
-./cleanup.sh # Cleanup for k8s
-
-TARGET=ocp ./cleanup.sh # Cleanup for ocp
+./cleanup.sh
 ```
 
 # CompositeResourceDefinitions (XRDs)
@@ -73,7 +53,6 @@ Provides a kubernetes namespace for deploying and testing software.
 
 ### Prerequisites
 
-- Crossplane Kubernetes `Provider` installed (not currently included)
 - A `ProviderConfig` named `eaas-kubernetes-provider-config` referencing a secret with the keys:
   - `apiserver`: The URL of the kubernetes API server
   - `kubeconfig`: A valid kubeconfig for authenticating to the cluster

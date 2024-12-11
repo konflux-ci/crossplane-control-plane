@@ -5,7 +5,7 @@ generators:
   - crossplane-helm-generator.yaml
 
 resources:
-  - ../base
+  - namespaces.yaml
 
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "-1"
