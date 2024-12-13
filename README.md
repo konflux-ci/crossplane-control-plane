@@ -7,7 +7,7 @@ with Konflux.
 The quickest way to install everything is to run the `deploy.sh` script.
 
 ```bash
-./deploy.sh
+./scripts/deploy.sh
 ```
 
 This will install crossplane from a helm chart and then deploy our control plane
@@ -42,7 +42,7 @@ kubectl apply -k config/
 # Cleanup
 
 ```bash
-./cleanup.sh
+./scripts/cleanup.sh
 ```
 
 # CompositeResourceDefinitions (XRDs)
@@ -75,4 +75,8 @@ kubectl apply -k examples/provider-kubernetes-in-cluster
 
 ### Usage
 
-See the [examples](./examples/xnamespace/).
+See the [examples](./examples/xnamespace/) or execute this script:
+
+```bash
+./scripts/test-xnamespaces.sh
+```

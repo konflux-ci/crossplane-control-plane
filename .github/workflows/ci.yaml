@@ -1,6 +1,9 @@
 name: CI Workflow
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -47,3 +50,29 @@ jobs:
         run: |
           echo "If this step fails, kube-linter found issues. Check the output of the scan step above."
           [[ "${{ steps.kube-linter-action-scan.outcome }}" == "success" ]]
+
+  deploy-test-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+
+      - name: Deploy
+        shell: bash
+        run: |
+          ./scripts/deploy.sh
+          kubectl apply -k examples/provider-kubernetes-in-cluster
+
+      - name: Test XNamespaces
+        shell: bash
+        run: |
+          ./scripts/test-xnamespaces.sh
+
+      - name: Cleanup
+        shell: bash
+        run: |
+          kubectl delete -k examples/provider-kubernetes-in-cluster
+          ./scripts/cleanup.sh
