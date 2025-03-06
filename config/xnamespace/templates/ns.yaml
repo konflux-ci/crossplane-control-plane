@@ -1,15 +1,19 @@
 ---
+{{- $ns := .observed.composite.resource.metadata.name | replace "." "-" }}
+
 apiVersion: kubernetes.crossplane.io/v1alpha2
 kind: Object
 metadata:
   annotations:
     gotemplating.fn.crossplane.io/composition-resource-name: namespace
+    crossplane.io/external-name: {{ $ns }}
 spec:
   forProvider:
     manifest:
       apiVersion: v1
       kind: Namespace
       metadata:
+        name: {{ $ns }}
         labels:
           konflux-ci.dev/namespace-type: eaas
   providerConfigRef:
@@ -19,4 +23,4 @@ spec:
 apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
 kind: Context
 data:
-  namespace: {{ .observed.resources.namespace.resource.metadata.name }}
+  namespace: {{ $ns }}
