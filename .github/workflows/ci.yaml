@@ -34,7 +34,7 @@ jobs:
         run: mkdir -p ../results
 
       - name: Scan with kube-linter
-        uses: stackrox/kube-linter-action@v1.0.4
+        uses: stackrox/kube-linter-action@v1.0.6
         with:
           directory: manifests
           format: sarif
