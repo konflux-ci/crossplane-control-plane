@@ -13,7 +13,6 @@ The quickest way to install everything is to run the `deploy.sh` script.
 This will install crossplane from a helm chart and then deploy our control plane
 configuration.
 
-
 ## Crossplane Helm Chart
 
 Here we have used Kustomization's Helm Chart Inflation Generator to install crossplane.
@@ -22,16 +21,7 @@ Here we have used Kustomization's Helm Chart Inflation Generator to install cros
 kustomize build --enable-helm crossplane/ | kubectl apply -f -
 ```
 
-This installs crossplane version 1.18.0 in the `crossplane-system` namespace.
-
-> **_Note_:**
-If you are using kind cluster then you need to pull the crossplane image locally first
-and then load the image into the kind cluster
-
-```bash
-docker pull crossplane/crossplane:v1.18.0
-kind load docker-image crossplane/crossplane:v1.18.0 --name crossplane
-```
+This installs crossplane in the `crossplane-system` namespace.
 
 ## Control Plane Configuration
 
