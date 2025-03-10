@@ -60,6 +60,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/function-auto-ready:v0.3.0
+  package: xpkg.upbound.io/crossplane-contrib/function-auto-ready:v0.4.2
   runtimeConfigRef:
     name: function-runtime-config
