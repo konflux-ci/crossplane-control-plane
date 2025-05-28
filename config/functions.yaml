@@ -23,10 +23,16 @@ spec:
                 - mountPath: /templates/xnamespace
                   name: xnamespace-templates
                   readOnly: true
+                - mountPath: /templates/xtestplatformcluster
+                  name: xtestplatformcluster-templates
+                  readOnly: true
           volumes:
             - name: xnamespace-templates
               configMap:
                 name: xnamespace-templates
+            - name: xtestplatformcluster-templates
+              configMap:
+                name: xtestplatformcluster-templates
 
 ---
 apiVersion: pkg.crossplane.io/v1

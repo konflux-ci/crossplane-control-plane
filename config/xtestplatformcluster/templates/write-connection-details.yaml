@@ -1,0 +1,9 @@
+---
+apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
+kind: CompositeConnectionDetails
+{{ if eq .observed.resources.ec.resource.status.atProvider.manifest.status nil -}}
+data: {}
+{{ else -}}
+data:
+  kubeconfig: {{ default (""|quote) (.observed.resources.ec.resource.status.atProvider.manifest.status.kubeconfig|b64enc) }}
+{{ end -}}

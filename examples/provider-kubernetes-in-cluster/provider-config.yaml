@@ -16,6 +16,17 @@ spec:
       key: kubeconfig
 
 ---
+apiVersion: kubernetes.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: testplatform-kubernetes-provider-config
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  credentials:
+    source: InjectedIdentity
+
+---
 apiVersion: v1
 kind: Secret
 metadata:

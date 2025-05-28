@@ -75,6 +75,11 @@ jobs:
         run: |
           ./scripts/test-xnamespaces.sh
 
+      - name: Test XTestPlatformCluster
+        shell: bash
+        run: |
+          ./scripts/test-xtestplatformcluster.sh
+
       - name: Cleanup
         shell: bash
         run: |

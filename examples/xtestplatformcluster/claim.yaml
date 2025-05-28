@@ -1,0 +1,23 @@
+---
+apiVersion: ci.openshift.org/v1alpha1
+kind: TestPlatformCluster
+metadata:
+  name: tp-aws-cluster
+spec:
+  ciOperator:
+    releases:
+      initial:
+        integration:
+          name: "4.20"
+          namespace: ocp
+      latest:
+        integration:
+          name: "4.20"
+          namespace: ocp
+    test:
+      clusterProfile: aws
+      env:
+        foo: bar
+      workflow: ipi-aws
+  writeConnectionSecretToRef:
+    name: aws-cluster-kubeconfig

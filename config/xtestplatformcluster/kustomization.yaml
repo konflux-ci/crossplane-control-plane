@@ -1,0 +1,15 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - xrd.yaml
+  - composition.yaml
+configMapGenerator:
+  - name: xtestplatformcluster-templates
+    namespace: crossplane-system
+    files:
+      - templates/create-ephemeral-cluster.yaml
+      - templates/report-conditions.yaml
+      - templates/write-connection-details.yaml
+generatorOptions:
+  disableNameSuffixHash: true
