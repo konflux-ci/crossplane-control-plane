@@ -6,3 +6,4 @@ resources:
   - functions.yaml
   - provider-kubernetes.yaml
   - xnamespace/
+  - xtestplatformcluster/

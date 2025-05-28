@@ -1,0 +1,18 @@
+---
+apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
+kind: ClaimConditions
+{{ if eq .observed.resources.ec.resource.status.atProvider.manifest.status.conditions nil -}}
+conditions: []
+{{ else if eq (len .observed.resources.ec.resource.status.atProvider.manifest.status.conditions) 0 -}}
+conditions: []
+{{ else -}}
+conditions:
+{{ range .observed.resources.ec.resource.status.atProvider.manifest.status.conditions -}}
+- type: {{ default "" .type|quote }}
+  status: {{ default "" .status|quote }}
+  lastTransitionTime: {{ default "" .lastTransitionTime|quote }}
+  reason: {{ default "" .reason|quote }}
+  message: {{ default "" .message|quote }}
+  target: "CompositeAndClaim"
+{{ end -}}
+{{ end -}}

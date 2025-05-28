@@ -1,0 +1,45 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: testplatform-ephemeral-cluster
+spec:
+  writeConnectionSecretsToNamespace: crossplane-connections
+  compositeTypeRef:
+    apiVersion: ci.openshift.org/v1alpha1
+    kind: XTestPlatformCluster
+  mode: Pipeline
+  pipeline:
+  - step: create-ephemeral-cluster
+    functionRef:
+      name: function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: FileSystem
+      fileSystem:
+        dirPath: /templates/xtestplatformcluster/create-ephemeral-cluster.yaml
+
+  - step: report-conditions
+    functionRef:
+      name: function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: FileSystem
+      fileSystem:
+        dirPath: /templates/xtestplatformcluster/report-conditions.yaml
+
+  - step: write-connection-details
+    functionRef:
+      name: function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: FileSystem
+      fileSystem:
+        dirPath: /templates/xtestplatformcluster/write-connection-details.yaml
+
+  - step: auto-detect-ready-composed-resources
+    functionRef:
+      name: function-auto-ready
