@@ -2,6 +2,8 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
   name: xtestplatformclusters.ci.openshift.org
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   group: ci.openshift.org
   names:
