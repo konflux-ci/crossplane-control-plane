@@ -3,6 +3,8 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
   name: testplatform-ephemeral-cluster
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   writeConnectionSecretsToNamespace: crossplane-connections
   compositeTypeRef:
