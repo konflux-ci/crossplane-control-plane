@@ -13,7 +13,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-kubernetes:v0.18.0
+  package: xpkg.upbound.io/crossplane-contrib/provider-kubernetes:v1.0.0
   runtimeConfigRef:
     name: provider-kubernetes-runtime-config
 
