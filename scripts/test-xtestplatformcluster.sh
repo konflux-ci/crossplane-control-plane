@@ -21,6 +21,7 @@ ec_patch='[{
     "path": "/status",
     "value": {
         "kubeconfig": "kubeconfig",
+        "kubeAdminPassword": "admin",
         "conditions": [{
             "type": "ClusterReady",
             "status": "True",
@@ -40,16 +41,25 @@ kubectl -n ephemeral-cluster patch ephemeralclusters.ci.openshift.io/"$ephemeral
 kubectl wait xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" --for=condition=ClusterReady=true --timeout=3m
 kubectl wait testplatformclusters.ci.openshift.org/"$claim_name" --for=condition=ClusterReady=true --timeout=3m
 
-# Wait for the kubeconfig to be bound to the claim's secret
-kubeconfig_secret="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o jsonpath='{.spec.writeConnectionSecretToRef.name}')"
-kubectl wait secret/"$kubeconfig_secret" --for=jsonpath='.data.kubeconfig' --timeout=3m
+# Wait for the cluster credentials to be bound to the claim's secret
+cluster_secret="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o jsonpath='{.spec.writeConnectionSecretToRef.name}')"
+kubectl wait secret/"$cluster_secret" --for=jsonpath='.data.kubeconfig' --timeout=3m
 
-# Make sure the kubeconfig secret holds the right value
-got_kubeconfig="$(kubectl get secret/"$kubeconfig_secret" -o jsonpath='{.data.kubeconfig}')"
+# Make sure the cluster secret holds the right kubeconfig
+got_kubeconfig="$(kubectl get secret/"$cluster_secret" -o jsonpath='{.data.kubeconfig}')"
 want_kubeconfig='a3ViZWNvbmZpZw=='
 
 if [ "$want_kubeconfig" != "$got_kubeconfig" ]; then
     echo "want kubeconfig '$want_kubeconfig' but got '$got_kubeconfig'"
+    exit 1
+fi
+
+# Make sure the cluster secret holds the right password
+got_passwd="$(kubectl get secret/"$cluster_secret" -o jsonpath='{.data.kubeAdminPassword}')"
+want_passwd='YWRtaW4='
+
+if [ "$want_passwd" != "$got_passwd" ]; then
+    echo "want kubeconfig '$want_passwd' but got '$got_passwd'"
     exit 1
 fi
 
