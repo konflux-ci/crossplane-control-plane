@@ -7,4 +7,5 @@ data: {}
 {{ else -}}
 data:
   kubeconfig: {{ default (""|quote) ($status.kubeconfig|b64enc) }}
+  kubeAdminPassword: {{ default (""|quote) ($status.kubeAdminPassword|b64enc) }}
 {{ end -}}
