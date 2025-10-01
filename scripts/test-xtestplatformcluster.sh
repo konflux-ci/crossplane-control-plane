@@ -63,6 +63,24 @@ if [ "$want_passwd" != "$got_passwd" ]; then
     exit 1
 fi
 
+# Make sure the pr event headers holds the expected value
+want_pr_event_headers='pr-event-headers'
+got_pr_event_headers="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o go-template-file=<(echo '{{ index .metadata.annotations "ephemeralcluster.ci.openshift.io/pr-event-headers" }}'))"
+
+if [ "$want_pr_event_headers" != "$got_pr_event_headers" ]; then
+    echo "want pr event headers '$want_pr_event_headers' but got '$got_pr_event_headers'"
+    exit 1
+fi
+
+# Make sure the pr event payload holds the expected value
+want_pr_event_payload='pr-event-payload'
+got_pr_event_payload="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o go-template-file=<(echo '{{ index .metadata.annotations "ephemeralcluster.ci.openshift.io/pr-event-payload" }}'))"
+
+if [ "$want_pr_event_payload" != "$got_pr_event_payload" ]; then
+    echo "want pr event payload '$want_pr_event_payload' but got '$got_pr_event_payload'"
+    exit 1
+fi
+
 # Clean everything up
 kubectl delete -f $ROOT/examples/xtestplatformcluster
 kubectl wait objects.kubernetes.crossplane.io --for=delete --all --timeout=3m
