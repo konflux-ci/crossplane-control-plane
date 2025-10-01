@@ -2,6 +2,9 @@
 apiVersion: ci.openshift.org/v1alpha1
 kind: TestPlatformCluster
 metadata:
+  annotations:
+    ephemeralcluster.ci.openshift.io/pr-event-headers: pr-event-headers
+    ephemeralcluster.ci.openshift.io/pr-event-payload: pr-event-payload
   name: tp-aws-cluster
 spec:
   ciOperator:

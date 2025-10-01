@@ -1,3 +1,4 @@
+{{ $annotations := .observed.composite.resource.metadata.annotations -}}
 ---
 apiVersion: kubernetes.crossplane.io/v1alpha2
 kind: Object
@@ -11,6 +12,11 @@ spec:
       apiVersion: ci.openshift.io/v1
       kind: EphemeralCluster
       metadata:
+        annotations:
+          "ephemeralcluster.ci.openshift.io/pr-event-headers": |
+            {{ get $annotations "ephemeralcluster.ci.openshift.io/pr-event-headers" }}
+          "ephemeralcluster.ci.openshift.io/pr-event-payload": |
+            {{ get $annotations "ephemeralcluster.ci.openshift.io/pr-event-payload" }}
         name: {{ .observed.composite.resource.metadata.name }}
         namespace: ephemeral-cluster
       spec: {{ .observed.composite.resource.spec|toPrettyJson }}
