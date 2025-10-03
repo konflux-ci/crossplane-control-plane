@@ -29,6 +29,7 @@ ec_patch='[{
             "reason": "",
             "message": ""
         }],
+        "prowJobURL": "https://prowjob.fake",
         "phase": "Ready"
     }
 }]'
@@ -78,6 +79,24 @@ got_pr_event_payload="$(kubectl get testplatformclusters.ci.openshift.org/"$clai
 
 if [ "$want_pr_event_payload" != "$got_pr_event_payload" ]; then
     echo "want pr event payload '$want_pr_event_payload' but got '$got_pr_event_payload'"
+    exit 1
+fi
+
+# Make sure that `.status.phase` is being reported as a condition
+got_ec_phase="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o go-template-file=<(echo '{{range .status.conditions}}{{if eq .type "_EphemeralClusterPhase"}}{{.message}}{{end}}{{end}}'))"
+want_ec_phase='Ready'
+
+if [ "$want_ec_phase" != "$got_ec_phase" ]; then
+    echo "want ec phase '$want_ec_phase' but got '$got_ec_phase'"
+    exit 1
+fi
+
+# Make sure that `.status.prowJobURL` is being reported as a condition
+got_pjurl="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o go-template-file=<(echo '{{range .status.conditions}}{{if eq .type "_ProwJobURL"}}{{.message}}{{end}}{{end}}'))"
+want_pjurl='https://prowjob.fake'
+
+if [ "$want_pjurl" != "$got_pjurl" ]; then
+    echo "want prowJobURL '$want_pjurl' but got '$got_pjurl'"
     exit 1
 fi
 
