@@ -4,7 +4,7 @@ kind: Kustomization
 helmCharts:
   - name: crossplane
     repo: https://charts.crossplane.io/stable
-    version: 2.1.0
+    version: 2.1.1
     releaseName: crossplane
     namespace: crossplane-system
     valuesFile: values.yaml
