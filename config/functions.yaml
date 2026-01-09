@@ -42,7 +42,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.9.3
+  package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.10.0
   runtimeConfigRef:
     name: function-runtime-config
 
