@@ -1,4 +1,11 @@
 ---
+replicas: 1
+leaderElection: false
+
+rbacManager:
+  replicas: 1
+  leaderElection: false
+
 securityContextCrossplane:
   runAsNonRoot: true
   runAsUser: null
