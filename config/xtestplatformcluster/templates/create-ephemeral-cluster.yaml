@@ -19,6 +19,10 @@ spec:
             {{ get $annotations "ephemeralcluster.ci.openshift.io/pr-event-payload" }}
         name: {{ .observed.composite.resource.metadata.name }}
         namespace: ephemeral-cluster
-      spec: {{ .observed.composite.resource.spec|toPrettyJson }}
+      spec:
+        ciOperator: {{ .observed.composite.resource.spec.ciOperator|toPrettyJson }}
+{{- if hasKey .observed.composite.resource.spec "tearDownCluster" }}
+        tearDownCluster: {{ .observed.composite.resource.spec.tearDownCluster }}
+{{- end }}
   providerConfigRef:
     name: testplatform-kubernetes-provider-config
