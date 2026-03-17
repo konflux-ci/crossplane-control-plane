@@ -54,7 +54,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/function-go-templating:v0.11.4
+  package: xpkg.upbound.io/crossplane-contrib/function-go-templating:v0.11.5
   runtimeConfigRef:
     name: function-runtime-config
 
