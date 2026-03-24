@@ -24,5 +24,6 @@ spec:
 {{- if hasKey .observed.composite.resource.spec "tearDownCluster" }}
         tearDownCluster: {{ .observed.composite.resource.spec.tearDownCluster }}
 {{- end }}
+  watch: true
   providerConfigRef:
     name: testplatform-kubernetes-provider-config
