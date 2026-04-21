@@ -13,15 +13,19 @@ kubectl apply -f $ROOT/examples/xtestplatformcluster/namespaces.yaml
 
 # Create a claim
 kubectl apply -f $ROOT/examples/xtestplatformcluster/claim.yaml
-kubectl wait xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" --for=condition=Ready=true --for=condition=Synced=true
+kubectl wait xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" --for=condition=Synced=true --timeout=3m
 
-# Notify that the ephemeral cluster is ready and set the kubeconfig
+# Simulate what the EphemeralCluster controller does: create a credentials Secret and set secretRef in the EphemeralCluster status.
+test_kubeconfig=$(cat "$ROOT/scripts/testdata/test-kubeconfig.yaml")
+kubectl -n ephemeral-cluster create secret generic test-credentials \
+    --from-literal=kubeconfig="$test_kubeconfig" \
+    --from-literal=kubeAdminPassword="admin"
+
 ec_patch='[{
     "op": "add",
     "path": "/status",
     "value": {
-        "kubeconfig": "kubeconfig",
-        "kubeAdminPassword": "admin",
+        "secretRef": "test-credentials",
         "conditions": [{
             "type": "ClusterReady",
             "status": "True",
@@ -34,12 +38,11 @@ ec_patch='[{
     }
 }]'
 
-kubectl wait objects.kubernetes.crossplane.io -l "crossplane.io/claim-name=$claim_name" --for=condition=Ready=true --for=condition=Synced=true --timeout=3m
-ephemeralcluster="$(kubectl get objects.kubernetes.crossplane.io -l "crossplane.io/claim-name=$claim_name" -o jsonpath='{.items[0].spec.forProvider.manifest.metadata.name}')"
+ephemeralcluster="$(kubectl get xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" -o jsonpath='{.items[0].metadata.name}')"
 kubectl -n ephemeral-cluster patch ephemeralclusters.ci.openshift.io/"$ephemeralcluster" --type=json -p="$ec_patch"
 
 # Wait for the EphemeralCluster's conditions to be propagated to both the Composite Resource and Claim
-kubectl wait xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" --for=condition=ClusterReady=true --timeout=3m
+kubectl wait xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" --for=condition=ClusterReady=true --for=condition=Ready=true --timeout=3m
 kubectl wait testplatformclusters.ci.openshift.org/"$claim_name" --for=condition=ClusterReady=true --timeout=3m
 
 # Wait for the cluster credentials to be bound to the claim's secret
@@ -48,7 +51,7 @@ kubectl wait secret/"$cluster_secret" --for=jsonpath='.data.kubeconfig' --timeou
 
 # Make sure the cluster secret holds the right kubeconfig
 got_kubeconfig="$(kubectl get secret/"$cluster_secret" -o jsonpath='{.data.kubeconfig}')"
-want_kubeconfig='a3ViZWNvbmZpZw=='
+want_kubeconfig=$(echo -n "$test_kubeconfig" | base64 -w0)
 
 if [ "$want_kubeconfig" != "$got_kubeconfig" ]; then
     echo "want kubeconfig '$want_kubeconfig' but got '$got_kubeconfig'"
@@ -60,7 +63,7 @@ got_passwd="$(kubectl get secret/"$cluster_secret" -o jsonpath='{.data.kubeAdmin
 want_passwd='YWRtaW4='
 
 if [ "$want_passwd" != "$got_passwd" ]; then
-    echo "want kubeconfig '$want_passwd' but got '$got_passwd'"
+    echo "want kubeAdminPassword '$want_passwd' but got '$got_passwd'"
     exit 1
 fi
 
