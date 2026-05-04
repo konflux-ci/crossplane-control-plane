@@ -10,6 +10,7 @@ configMapGenerator:
     files:
       - templates/create-ephemeral-cluster.yaml
       - templates/report-conditions.yaml
-      - templates/write-connection-details.yaml
+      - templates/observe-credentials-secret.yaml
+
 generatorOptions:
   disableNameSuffixHash: true

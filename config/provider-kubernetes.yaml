@@ -41,3 +41,4 @@ spec:
                 runAsGroup: null
               args:
                 - '--sanitize-secrets'
+                - '--enable-watches'

@@ -32,7 +32,7 @@ spec:
       fileSystem:
         dirPath: /templates/xtestplatformcluster/report-conditions.yaml
 
-  - step: write-connection-details
+  - step: observe-credentials-secret
     functionRef:
       name: function-go-templating
     input:
@@ -40,7 +40,23 @@ spec:
       kind: GoTemplate
       source: FileSystem
       fileSystem:
-        dirPath: /templates/xtestplatformcluster/write-connection-details.yaml
+        dirPath: /templates/xtestplatformcluster/observe-credentials-secret.yaml
+
+  - step: write-connection-details
+    functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources:
+      - name: credentials
+        connectionDetails:
+        - name: kubeconfig
+          type: FromConnectionSecretKey
+          fromConnectionSecretKey: kubeconfig
+        - name: kubeAdminPassword
+          type: FromConnectionSecretKey
+          fromConnectionSecretKey: kubeAdminPassword
 
   - step: auto-detect-ready-composed-resources
     functionRef:
