@@ -2,7 +2,12 @@
 set -eu -o pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"/..
-claim_name='tp-aws-cluster'
+source "$ROOT/scripts/debug-dump.sh"
+claim_group="testplatformclusters.ci.openshift.org"
+xr_group="xtestplatformclusters.ci.openshift.org"
+claim_name="tp-aws-cluster"
+claim_label="crossplane.io/claim-name=$claim_name"
+register_debug_dump "$claim_group" "$claim_name"
 
 # Install the EphemeralCluster CRD
 ephemeralcluster_crd='https://raw.githubusercontent.com/openshift/ci-tools/refs/heads/main/pkg/api/ephemeralcluster/v1/ci.openshift.io_ephemeralclusters.yaml'
@@ -13,7 +18,7 @@ kubectl apply -f $ROOT/examples/xtestplatformcluster/namespaces.yaml
 
 # Create a claim
 kubectl apply -f $ROOT/examples/xtestplatformcluster/claim.yaml
-kubectl wait xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" --for=condition=Synced=true --timeout=3m
+kubectl wait $xr_group -l "$claim_label" --for=condition=Synced=true --timeout=3m
 
 # Simulate what the EphemeralCluster controller does: create a credentials Secret and set secretRef in the EphemeralCluster status.
 test_kubeconfig=$(cat "$ROOT/scripts/testdata/test-kubeconfig.yaml")
@@ -38,15 +43,15 @@ ec_patch='[{
     }
 }]'
 
-ephemeralcluster="$(kubectl get xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" -o jsonpath='{.items[0].metadata.name}')"
+ephemeralcluster="$(kubectl get $xr_group -l "$claim_label" -o jsonpath='{.items[0].metadata.name}')"
 kubectl -n ephemeral-cluster patch ephemeralclusters.ci.openshift.io/"$ephemeralcluster" --type=json -p="$ec_patch"
 
 # Wait for the EphemeralCluster's conditions to be propagated to both the Composite Resource and Claim
-kubectl wait xtestplatformclusters.ci.openshift.org -l "crossplane.io/claim-name=$claim_name" --for=condition=ClusterReady=true --for=condition=Ready=true --timeout=3m
-kubectl wait testplatformclusters.ci.openshift.org/"$claim_name" --for=condition=ClusterReady=true --timeout=3m
+kubectl wait $xr_group -l "$claim_label" --for=condition=ClusterReady=true --for=condition=Ready=true --timeout=3m
+kubectl wait $claim_group/"$claim_name" --for=condition=ClusterReady=true --timeout=3m
 
 # Wait for the cluster credentials to be bound to the claim's secret
-cluster_secret="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o jsonpath='{.spec.writeConnectionSecretToRef.name}')"
+cluster_secret="$(kubectl get $claim_group/"$claim_name" -o jsonpath='{.spec.writeConnectionSecretToRef.name}')"
 kubectl wait secret/"$cluster_secret" --for=jsonpath='.data.kubeconfig' --timeout=3m
 
 # Make sure the cluster secret holds the right kubeconfig
@@ -68,7 +73,7 @@ if [ "$want_passwd" != "$got_passwd" ]; then
 fi
 
 # Make sure that `.status.phase` is being reported as a condition
-got_ec_phase="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o go-template-file=<(echo '{{range .status.conditions}}{{if eq .type "_EphemeralClusterPhase"}}{{.message}}{{end}}{{end}}'))"
+got_ec_phase="$(kubectl get $claim_group/"$claim_name" -o go-template-file=<(echo '{{range .status.conditions}}{{if eq .type "_EphemeralClusterPhase"}}{{.message}}{{end}}{{end}}'))"
 want_ec_phase='Ready'
 
 if [ "$want_ec_phase" != "$got_ec_phase" ]; then
@@ -77,7 +82,7 @@ if [ "$want_ec_phase" != "$got_ec_phase" ]; then
 fi
 
 # Make sure that `.status.prowJobURL` is being reported as a condition
-got_pjurl="$(kubectl get testplatformclusters.ci.openshift.org/"$claim_name" -o go-template-file=<(echo '{{range .status.conditions}}{{if eq .type "_ProwJobURL"}}{{.message}}{{end}}{{end}}'))"
+got_pjurl="$(kubectl get $claim_group/"$claim_name" -o go-template-file=<(echo '{{range .status.conditions}}{{if eq .type "_ProwJobURL"}}{{.message}}{{end}}{{end}}'))"
 want_pjurl='https://prowjob.fake'
 
 if [ "$want_pjurl" != "$got_pjurl" ]; then
