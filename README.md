@@ -1,35 +1,22 @@
 # crossplane-control-plane
-This repository contains all configuration needed to setup crossplane for use
-with Konflux.
+This repository contains all configuration needed to setup crossplane for use with Konflux.
 
-# Installation
+# Getting Started
 
-The quickest way to install everything is to run the `deploy.sh` script.
+The quickest way to get started is to run the `deploy.sh` script.
 
 ```bash
 ./scripts/deploy.sh
 ```
 
-This will install crossplane from a helm chart and then deploy our control plane
-configuration.
+This deploys crossplane from a helm chart, all necessary providers and functions, and our XRD
+configuration to a kubernetes/OpenShift cluster.
 
-## Crossplane Helm Chart
+It also deploys some example ProviderConfigs and RBAC configuration necessary to test the compositions.
+Refer to the [provider-kubernetes-in-cluster](./examples/provider-kubernetes-in-cluster/) example to
+learn about these prerequisites.
 
-Here we have used Kustomization's Helm Chart Inflation Generator to install crossplane.
-
-```bash
-kustomize build --enable-helm crossplane/ | kubectl apply -f -
-```
-
-This installs crossplane in the `crossplane-system` namespace.
-
-## Control Plane Configuration
-
-```bash
-kubectl apply -k config/
-```
-
-# Cleanup
+All resources can be removed using the cleanup script.
 
 ```bash
 ./scripts/cleanup.sh
@@ -41,32 +28,19 @@ kubectl apply -k config/
 
 Provides a kubernetes namespace for deploying and testing software.
 
-### Prerequisites
-
-- A `ProviderConfig` named `eaas-kubernetes-provider-config` referencing a secret with the keys:
-  - `apiserver`: The URL of the kubernetes API server
-  - `kubeconfig`: A valid kubeconfig for authenticating to the cluster
-- The account associated with the kubeconfig must be granted full control of:
-    - `LimitRanges`
-    - `Namespaces`
-    - `NetworkPolicies`
-    - `ResourceQuotas`
-    - `RoleBindings`
-    - `Secrets`
-    - `ServiceAccounts`
-- The account must also be granted the `edit` ClusterRole.
-
-All of this is configured in an example which sets up the kubernetes provider
-to interact with the local cluster.
-
-```bash
-kubectl apply -k examples/provider-kubernetes-in-cluster
-```
-
-### Usage
-
-See the [examples](./examples/xnamespace/) or execute this script:
+See [here](./examples/xnamespace/) for an example claim or run a test with it using:
 
 ```bash
 ./scripts/test-xnamespaces.sh
 ```
+
+## xtestplatformcluster.ci.openshift.org
+
+Provisions an ephemeral OpenShift cluster via OpenShift-CI infrastructure.
+
+See [here](./examples/xtestplatformcluster/) for an example claim or run a test with it using:
+
+```bash
+./scripts/test-xtestplatformcluster.sh
+```
+

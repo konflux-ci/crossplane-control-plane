@@ -8,3 +8,6 @@ kubectl wait --for=condition=Available deployment -n crossplane-system --all --t
 
 kubectl apply -k $ROOT/config/
 kubectl wait --for=condition=Healthy functions,providers --all --timeout=120s
+
+kubectl apply -k $ROOT/examples/provider-kubernetes-in-cluster
+
