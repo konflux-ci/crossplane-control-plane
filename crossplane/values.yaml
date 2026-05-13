@@ -6,6 +6,18 @@ rbacManager:
   replicas: 1
   leaderElection: false
 
+image:
+  repository: quay.io/konflux-ci/crossplane-components@sha256:7f050bdbef3f361861cf67077660c01fb2b3b4afbca780356d8e540dbb576da4
+  tag: ""
+  ignoreTag: true
+  pullPolicy: IfNotPresent
+
+provider:
+  packages: []
+
+function:
+  packages: []
+
 securityContextCrossplane:
   runAsNonRoot: true
   runAsUser: null

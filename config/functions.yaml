@@ -42,7 +42,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.10.4
+  package: quay.io/konflux-ci/crossplane-components/function-patch-and-transform@sha256:a174b3990f3721fe91c0f879b20dfbbd0a681b68cafe37a1cc09c69a246c9bf2
   runtimeConfigRef:
     name: function-runtime-config
 
@@ -54,7 +54,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/function-go-templating:v0.12.0
+  package: quay.io/konflux-ci/crossplane-components/function-go-templating@sha256:c4bbec60218eb8d7a2498ab80a1c07ba4ce7936a7291b2b94e9c6527ae51761f
   runtimeConfigRef:
     name: function-runtime-config
 
@@ -66,6 +66,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/function-auto-ready:v0.6.4
+  package: quay.io/konflux-ci/crossplane-components/function-auto-ready@sha256:35c76ab442914fdc607af4c3c2e6380c61fad728f49cd46f145e3be92b46c771
   runtimeConfigRef:
     name: function-runtime-config
