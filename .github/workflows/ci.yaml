@@ -21,11 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Kustomize
-        uses: multani/action-setup-kustomize@v1
-        with:
-          version: 5.1.1
-
       - name: Run kustomize build
         id: kube-linter-action-scan
         shell: bash
