@@ -9,5 +9,28 @@
       "^config/provider.*\\.yaml$",
       "^config/function.*\\.yaml$"
     ]
-  }
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^crossplane/values\\.yaml$"
+      ],
+      "matchStrings": [
+        "repository:\\s+(?<depName>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchFileNames": [
+        "crossplane/values.yaml"
+      ],
+      "matchManagers": [
+        "docker"
+      ],
+      "enabled": false
+    }
+  ]
 }
