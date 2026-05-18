@@ -13,12 +13,13 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^crossplane/values\\.yaml$"
+      "managerFilePatterns": [
+        "/^crossplane/values\\.yaml$/"
       ],
       "matchStrings": [
         "repository:\\s+(?<depName>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)"
       ],
+      "currentValueTemplate": "latest",
       "datasourceTemplate": "docker"
     }
   ],
