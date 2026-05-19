@@ -52,6 +52,17 @@ jobs:
           echo "If this step fails, kube-linter found issues. Check the output of the scan step above."
           [[ "${{ steps.kube-linter-action-scan.outcome }}" == "success" ]]
 
+      - name: Verify AGENTS.md line count
+        shell: bash
+        run: |
+          max_lines=300
+          line_count=$(wc -l < AGENTS.md)
+          echo "AGENTS.md has $line_count lines (max: $max_lines)"
+          if [ "$line_count" -ge "$max_lines" ]; then
+            echo "AGENTS.md exceeds the $max_lines-line limit"
+            exit 1
+          fi
+
   deploy-test-cleanup:
     runs-on: ubuntu-latest
     steps:
@@ -63,22 +74,17 @@ jobs:
 
       - name: Deploy
         shell: bash
-        run: |
-          ./scripts/deploy.sh
-          kubectl apply -k examples/provider-kubernetes-in-cluster
+        run: ./scripts/deploy.sh
 
       - name: Test XNamespaces
         shell: bash
-        run: |
-          ./scripts/test-xnamespaces.sh
+        run: ./scripts/test-xnamespaces.sh
 
       - name: Test XTestPlatformCluster
         shell: bash
-        run: |
-          ./scripts/test-xtestplatformcluster.sh
+        run: ./scripts/test-xtestplatformcluster.sh
 
       - name: Cleanup
         shell: bash
-        run: |
-          kubectl delete -k examples/provider-kubernetes-in-cluster
-          ./scripts/cleanup.sh
+        run: ./scripts/cleanup.sh
+
