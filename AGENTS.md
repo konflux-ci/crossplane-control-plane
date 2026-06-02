@@ -26,6 +26,12 @@ and compositions for use within Konflux.
 - Create an example claim in `examples/<name>/`
 - Create a test script in `scripts/`
 
+## AI Skills
+
+Repo-specific skills live in `skills/`, symlinked for Claude Code (`.claude/skills`) and Cursor (`.cursor/skills`).
+
+- [adding-xrd-composition](skills/adding-xrd-composition/SKILL.md) — checklist for new XRDs, compositions, templates, examples, and test scripts
+
 ## Verifying Changes
 
 All tests require a kubernetes cluster. There are no unit tests.
