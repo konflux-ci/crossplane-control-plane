@@ -19,6 +19,11 @@ spec:
 {{- if hasKey .observed.composite.resource.spec "tearDownCluster" }}
         tearDownCluster: {{ .observed.composite.resource.spec.tearDownCluster }}
 {{- end }}
+  readiness:
+    policy: DeriveFromCelQuery
+    celQuery: |
+      has(object.status) && has(object.status.conditions) &&
+      object.status.conditions.exists(c, c.type == 'ClusterReady' && c.status == 'True')
   watch: true
   providerConfigRef:
     name: testplatform-kubernetes-provider-config
