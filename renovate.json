@@ -19,6 +19,7 @@
       "matchStrings": [
         "repository:\\s+(?<depName>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)"
       ],
+      "autoReplaceStringTemplate": "repository: {{{depName}}}@{{{newDigest}}}",
       "currentValueTemplate": "latest",
       "datasourceTemplate": "docker"
     }
