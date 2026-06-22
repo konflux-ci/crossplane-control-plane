@@ -30,7 +30,7 @@
         "crossplane/values.yaml"
       ],
       "matchManagers": [
-        "docker"
+        "helm-values"
       ],
       "enabled": false
     }
