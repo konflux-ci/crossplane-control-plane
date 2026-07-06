@@ -1,0 +1,7 @@
+---
+apiVersion: apiextensions.crossplane.io/v1beta1
+kind: EnvironmentConfig
+metadata:
+  name: envcfg
+data:
+  clusterName: test-cluster
