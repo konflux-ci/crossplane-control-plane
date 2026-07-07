@@ -1,5 +1,13 @@
-{{ $annotations := .observed.composite.resource.metadata.annotations -}}
+apiVersion: meta.gotemplating.fn.crossplane.io/v1alpha1
+kind: ExtraResources
+requirements:
+  envcfg:
+    apiVersion: apiextensions.crossplane.io/v1beta1
+    kind: EnvironmentConfig
+    matchName: envcfg
+
 ---
+{{- if .extraResources.envcfg.items }}
 apiVersion: kubernetes.crossplane.io/v1alpha2
 kind: Object
 metadata:
@@ -14,6 +22,9 @@ spec:
       metadata:
         name: {{ .observed.composite.resource.metadata.name }}
         namespace: ephemeral-cluster
+        annotations:
+          ephemeralcluster.ci.openshift.io/konflux-tenant: {{ .observed.composite.resource.spec.claimRef.namespace }}
+          ephemeralcluster.ci.openshift.io/konflux-cluster: {{ (first .extraResources.envcfg.items).resource.data.clusterName }}
       spec:
         ciOperator: {{ .observed.composite.resource.spec.ciOperator|toPrettyJson }}
 {{- if hasKey .observed.composite.resource.spec "tearDownCluster" }}
@@ -27,3 +38,4 @@ spec:
   watch: true
   providerConfigRef:
     name: testplatform-kubernetes-provider-config
+{{- end }}

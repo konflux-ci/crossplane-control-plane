@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"/..
 source "$ROOT/scripts/debug-dump.sh"
 claim_group="testplatformclusters.ci.openshift.org"
 xr_group="xtestplatformclusters.ci.openshift.org"
+ec_group="ephemeralclusters.ci.openshift.io"
 claim_name="tp-aws-cluster"
 claim_label="crossplane.io/claim-name=$claim_name"
 register_debug_dump "$claim_group" "$claim_name"
@@ -12,12 +13,13 @@ register_debug_dump "$claim_group" "$claim_name"
 # Install the EphemeralCluster CRD
 ephemeralcluster_crd='https://raw.githubusercontent.com/openshift/ci-tools/refs/heads/main/pkg/api/ephemeralcluster/v1/ci.openshift.io_ephemeralclusters.yaml'
 curl -sSL "$ephemeralcluster_crd" | kubectl apply -f -
-kubectl wait crd/ephemeralclusters.ci.openshift.io --for=condition=Established=true --for=condition=NamesAccepted=true
+kubectl wait crd/"$ec_group" --for=condition=Established=true --for=condition=NamesAccepted=true
 
-kubectl apply -f $ROOT/examples/xtestplatformcluster/namespaces.yaml
+kubectl apply -f "$ROOT"/examples/xtestplatformcluster/namespaces.yaml
+kubectl apply -f "$ROOT"/examples/xtestplatformcluster/environment-config.yaml
 
 # Create a claim
-kubectl apply -f $ROOT/examples/xtestplatformcluster/claim.yaml
+kubectl apply -f "$ROOT"/examples/xtestplatformcluster/claim.yaml
 kubectl wait $xr_group -l "$claim_label" --for=condition=Synced=true --timeout=3m
 
 # Simulate what the EphemeralCluster controller does: create a credentials Secret and set secretRef in the EphemeralCluster status.
@@ -44,7 +46,7 @@ ec_patch='[{
 }]'
 
 ephemeralcluster="$(kubectl get $xr_group -l "$claim_label" -o jsonpath='{.items[0].metadata.name}')"
-kubectl -n ephemeral-cluster patch ephemeralclusters.ci.openshift.io/"$ephemeralcluster" --type=json -p="$ec_patch"
+kubectl -n ephemeral-cluster patch "$ec_group"/"$ephemeralcluster" --type=json -p="$ec_patch"
 
 # Wait for the EphemeralCluster's conditions to be propagated to both the Composite Resource and Claim
 kubectl wait $xr_group -l "$claim_label" --for=condition=ClusterReady=true --for=condition=Ready=true --timeout=3m
@@ -90,6 +92,24 @@ if [ "$want_pjurl" != "$got_pjurl" ]; then
     exit 1
 fi
 
+# Make sure the EphemeralCluster has the konflux-tenant annotation set to the claim namespace
+got_tenant="$(kubectl -n ephemeral-cluster get "$ec_group"/"$ephemeralcluster" -o jsonpath='{.metadata.annotations.ephemeralcluster\.ci\.openshift\.io/konflux-tenant}')"
+want_tenant='default'
+
+if [ "$want_tenant" != "$got_tenant" ]; then
+    echo "want konflux-tenant annotation '$want_tenant' but got '$got_tenant'"
+    exit 1
+fi
+
+# Make sure the EphemeralCluster has the konflux-cluster annotation set to the EnvironmentConfig cluster name
+got_cluster="$(kubectl -n ephemeral-cluster get "$ec_group"/"$ephemeralcluster" -o jsonpath='{.metadata.annotations.ephemeralcluster\.ci\.openshift\.io/konflux-cluster}')"
+want_cluster='test-cluster'
+
+if [ "$want_cluster" != "$got_cluster" ]; then
+    echo "want konflux-cluster annotation '$want_cluster' but got '$got_cluster'"
+    exit 1
+fi
+
 # Clean everything up
-kubectl delete -f $ROOT/examples/xtestplatformcluster
+kubectl delete -f "$ROOT"/examples/xtestplatformcluster
 kubectl wait objects.kubernetes.crossplane.io --for=delete --all --timeout=3m
