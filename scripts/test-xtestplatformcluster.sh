@@ -15,11 +15,11 @@ ephemeralcluster_crd='https://raw.githubusercontent.com/openshift/ci-tools/refs/
 curl -sSL "$ephemeralcluster_crd" | kubectl apply -f -
 kubectl wait crd/"$ec_group" --for=condition=Established=true --for=condition=NamesAccepted=true
 
-kubectl apply -f $ROOT/examples/xtestplatformcluster/namespaces.yaml
-kubectl apply -f $ROOT/examples/xtestplatformcluster/environment-config.yaml
+kubectl apply -f "$ROOT"/examples/xtestplatformcluster/namespaces.yaml
+kubectl apply -f "$ROOT"/examples/xtestplatformcluster/environment-config.yaml
 
 # Create a claim
-kubectl apply -f $ROOT/examples/xtestplatformcluster/claim.yaml
+kubectl apply -f "$ROOT"/examples/xtestplatformcluster/claim.yaml
 kubectl wait $xr_group -l "$claim_label" --for=condition=Synced=true --timeout=3m
 
 # Simulate what the EphemeralCluster controller does: create a credentials Secret and set secretRef in the EphemeralCluster status.
@@ -111,5 +111,5 @@ if [ "$want_cluster" != "$got_cluster" ]; then
 fi
 
 # Clean everything up
-kubectl delete -f $ROOT/examples/xtestplatformcluster
+kubectl delete -f "$ROOT"/examples/xtestplatformcluster
 kubectl wait objects.kubernetes.crossplane.io --for=delete --all --timeout=3m
