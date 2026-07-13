@@ -1,4 +1,5 @@
 ---
+nameOverride: crossplane
 replicas: 1
 leaderElection: false
 
