@@ -10,6 +10,25 @@ claim_name="tp-aws-cluster"
 claim_label="crossplane.io/claim-name=$claim_name"
 register_debug_dump "$claim_group" "$claim_name"
 
+wait_timeout_secs=180
+wait_timeout="${wait_timeout_secs}s"
+
+# kubectl wait with -l exits immediately when no resources match yet; poll first.
+wait_until_exists() {
+    local deadline=$((SECONDS + wait_timeout_secs))
+    local names=""
+
+    while (( SECONDS < deadline )); do
+        names="$(kubectl get "$@" -o name 2>/dev/null || true)"
+        if [[ -n "$names" ]]; then
+            return 0
+        fi
+        sleep 1
+    done
+    echo "timed out waiting for: kubectl get $*"
+    return 1
+}
+
 # Install the EphemeralCluster CRD
 ephemeralcluster_crd='https://raw.githubusercontent.com/openshift/ci-tools/refs/heads/main/pkg/api/ephemeralcluster/v1/ci.openshift.io_ephemeralclusters.yaml'
 curl -sSL "$ephemeralcluster_crd" | kubectl apply -f -
@@ -20,7 +39,13 @@ kubectl apply -f "$ROOT"/examples/xtestplatformcluster/environment-config.yaml
 
 # Create a claim
 kubectl apply -f "$ROOT"/examples/xtestplatformcluster/claim.yaml
-kubectl wait $xr_group -l "$claim_label" --for=condition=Synced=true --timeout=3m
+wait_until_exists $xr_group -l "$claim_label"
+kubectl wait $xr_group -l "$claim_label" --for=condition=Synced=true --timeout="$wait_timeout"
+
+ephemeralcluster="$(kubectl get $xr_group -l "$claim_label" -o jsonpath='{.items[0].metadata.name}')"
+credentials_obj="objects.kubernetes.crossplane.io/credentials-${ephemeralcluster}"
+
+wait_until_exists -n ephemeral-cluster "$ec_group/$ephemeralcluster"
 
 # Simulate what the EphemeralCluster controller does: create a credentials Secret and set secretRef in the EphemeralCluster status.
 test_kubeconfig=$(cat "$ROOT/scripts/testdata/test-kubeconfig.yaml")
@@ -28,33 +53,36 @@ kubectl -n ephemeral-cluster create secret generic test-credentials \
     --from-literal=kubeconfig="$test_kubeconfig" \
     --from-literal=kubeAdminPassword="admin"
 
-ec_patch='[{
-    "op": "add",
-    "path": "/status",
-    "value": {
-        "secretRef": "test-credentials",
-        "conditions": [{
-            "type": "ClusterReady",
-            "status": "True",
-            "lastTransitionTime": "2025-05-28T12:12:12Z",
-            "reason": "",
-            "message": ""
-        }],
-        "prowJobURL": "https://prowjob.fake",
-        "phase": "Ready"
-    }
-}]'
+# Status is a subresource; JSON-patching /status on the main resource is silently ignored once
+# provider-kubernetes owns the object. Use server-side apply on the status subresource instead.
+kubectl apply --server-side --subresource=status --force-conflicts -f - <<EOF
+apiVersion: ci.openshift.io/v1
+kind: EphemeralCluster
+metadata:
+  name: ${ephemeralcluster}
+  namespace: ephemeral-cluster
+status:
+  secretRef: test-credentials
+  phase: Ready
+  prowJobURL: https://prowjob.fake
+  conditions:
+  - type: ClusterReady
+    status: "True"
+    lastTransitionTime: "2025-05-28T12:12:12Z"
+EOF
 
-ephemeralcluster="$(kubectl get $xr_group -l "$claim_label" -o jsonpath='{.items[0].metadata.name}')"
-kubectl -n ephemeral-cluster patch "$ec_group"/"$ephemeralcluster" --type=json -p="$ec_patch"
+# Composition initially renders credentials against secret name "pending" until it observes secretRef.
+kubectl wait "$credentials_obj" \
+    --for=jsonpath='{.spec.forProvider.manifest.metadata.name}'=test-credentials \
+    --timeout="$wait_timeout"
 
 # Wait for the EphemeralCluster's conditions to be propagated to both the Composite Resource and Claim
-kubectl wait $xr_group -l "$claim_label" --for=condition=ClusterReady=true --for=condition=Ready=true --timeout=3m
-kubectl wait $claim_group/"$claim_name" --for=condition=ClusterReady=true --timeout=3m
+kubectl wait $xr_group -l "$claim_label" --for=condition=ClusterReady=true --for=condition=Ready=true --timeout="$wait_timeout"
+kubectl wait $claim_group/"$claim_name" --for=condition=ClusterReady=true --timeout="$wait_timeout"
 
 # Wait for the cluster credentials to be bound to the claim's secret
 cluster_secret="$(kubectl get $claim_group/"$claim_name" -o jsonpath='{.spec.writeConnectionSecretToRef.name}')"
-kubectl wait secret/"$cluster_secret" --for=jsonpath='.data.kubeconfig' --timeout=3m
+kubectl wait secret/"$cluster_secret" --for=jsonpath='.data.kubeconfig' --timeout="$wait_timeout"
 
 # Make sure the cluster secret holds the right kubeconfig
 got_kubeconfig="$(kubectl get secret/"$cluster_secret" -o jsonpath='{.data.kubeconfig}')"
@@ -93,7 +121,7 @@ if [ "$want_pjurl" != "$got_pjurl" ]; then
 fi
 
 # Make sure the EphemeralCluster has the konflux-tenant annotation set to the claim namespace
-got_tenant="$(kubectl -n ephemeral-cluster get "$ec_group"/"$ephemeralcluster" -o jsonpath='{.metadata.annotations.ephemeralcluster\.ci\.openshift\.io/konflux-tenant}')"
+got_tenant="$(kubectl -n ephemeral-cluster get "$ec_group/$ephemeralcluster" -o jsonpath='{.metadata.annotations.ephemeralcluster\.ci\.openshift\.io/konflux-tenant}')"
 want_tenant='default'
 
 if [ "$want_tenant" != "$got_tenant" ]; then
@@ -102,7 +130,7 @@ if [ "$want_tenant" != "$got_tenant" ]; then
 fi
 
 # Make sure the EphemeralCluster has the konflux-cluster annotation set to the EnvironmentConfig cluster name
-got_cluster="$(kubectl -n ephemeral-cluster get "$ec_group"/"$ephemeralcluster" -o jsonpath='{.metadata.annotations.ephemeralcluster\.ci\.openshift\.io/konflux-cluster}')"
+got_cluster="$(kubectl -n ephemeral-cluster get "$ec_group/$ephemeralcluster" -o jsonpath='{.metadata.annotations.ephemeralcluster\.ci\.openshift\.io/konflux-cluster}')"
 want_cluster='test-cluster'
 
 if [ "$want_cluster" != "$got_cluster" ]; then
@@ -112,4 +140,4 @@ fi
 
 # Clean everything up
 kubectl delete -f "$ROOT"/examples/xtestplatformcluster
-kubectl wait objects.kubernetes.crossplane.io --for=delete --all --timeout=3m
+kubectl wait objects.kubernetes.crossplane.io --for=delete --all --timeout="$wait_timeout"
