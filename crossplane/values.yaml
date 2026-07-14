@@ -8,7 +8,7 @@ rbacManager:
   leaderElection: false
 
 image:
-  repository: quay.io/konflux-ci/crossplane-components@sha256:e517e8da85796c269b479bd86dd4bf581f88bd3b5bcf1fabbece6b2a8271beb6
+  repository: quay.io/konflux-ci/crossplane-components@sha256:7738578a5efadb6b4059e55bee66eb54cf0cec7f40563ae081c4dd95fa161efa
   tag: ""
   ignoreTag: true
   pullPolicy: IfNotPresent
