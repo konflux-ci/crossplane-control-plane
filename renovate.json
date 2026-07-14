@@ -32,6 +32,7 @@
         "version:\\s+(?<currentValue>\\S+)"
       ],
       "depNameTemplate": "quay.io/konflux-ci/crossplane-components/crossplane-helm",
+      "currentValueTemplate": "{{{replace '\\+' '_' currentValue}}}",
       "datasourceTemplate": "docker",
       "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)([_+](?<build>.+))?$",
       "autoReplaceStringTemplate": "version: {{{replace '_' '+' newValue}}}"
