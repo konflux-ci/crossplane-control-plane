@@ -22,6 +22,19 @@
       "autoReplaceStringTemplate": "repository: {{{depName}}}@{{{newDigest}}}",
       "currentValueTemplate": "latest",
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^crossplane/kustomization\\.yaml$/"
+      ],
+      "matchStrings": [
+        "version:\\s+(?<currentValue>\\S+)"
+      ],
+      "depNameTemplate": "quay.io/konflux-ci/crossplane-components/crossplane-helm",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)([_+](?<build>.+))?$",
+      "autoReplaceStringTemplate": "version: {{{replace '_' '+' newValue}}}"
     }
   ],
   "packageRules": [
@@ -31,6 +44,15 @@
       ],
       "matchManagers": [
         "helm-values"
+      ],
+      "enabled": false
+    },
+    {
+      "matchFileNames": [
+        "crossplane/kustomization.yaml"
+      ],
+      "matchManagers": [
+        "kustomize"
       ],
       "enabled": false
     }
