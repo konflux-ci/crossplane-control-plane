@@ -138,6 +138,20 @@ if [ "$want_cluster" != "$got_cluster" ]; then
     exit 1
 fi
 
+got_pipelinerun_name="$(kubectl -n ephemeral-cluster get "$ec_group/$ephemeralcluster" -o jsonpath='{.metadata.annotations.ephemeralcluster\.ci\.openshift\.io/pipeline-run-name}')"
+want_pipelinerun_name='foo'
+if [ "$want_pipelinerun_name" != "$got_pipelinerun_name" ]; then
+    echo "want PipelineRun name '$want_pipelinerun_name' but got '$got_pipelinerun_name'"
+    exit 1
+fi
+
+got_taskrun_name="$(kubectl -n ephemeral-cluster get "$ec_group/$ephemeralcluster" -o jsonpath='{.metadata.annotations.ephemeralcluster\.ci\.openshift\.io/task-run-name}')"
+want_taskrun_name='bar'
+if [ "$want_taskrun_name" != "$got_taskrun_name" ]; then
+    echo "want TaskRun name '$want_taskrun_name' but got '$got_taskrun_name'"
+    exit 1
+fi
+
 # Clean everything up
 kubectl delete -f "$ROOT"/examples/xtestplatformcluster
 kubectl wait objects.kubernetes.crossplane.io --for=delete --all --timeout="$wait_timeout"

@@ -7,6 +7,7 @@ requirements:
     matchName: envcfg
 
 ---
+{{- $resource_annotations := .observed.composite.resource.metadata.annotations }}
 {{- if .extraResources.envcfg.items }}
 apiVersion: kubernetes.crossplane.io/v1alpha2
 kind: Object
@@ -25,6 +26,14 @@ spec:
         annotations:
           ephemeralcluster.ci.openshift.io/konflux-tenant: {{ .observed.composite.resource.spec.claimRef.namespace }}
           ephemeralcluster.ci.openshift.io/konflux-cluster: {{ (first .extraResources.envcfg.items).resource.data.clusterName }}
+{{- if ne $resource_annotations nil }}
+  {{- $pipeline_run_name := index $resource_annotations "ephemeralcluster.ci.openshift.io/pipeline-run-name" }}
+  {{- $task_run_name := index $resource_annotations "ephemeralcluster.ci.openshift.io/task-run-name" }}
+          ephemeralcluster.ci.openshift.io/task-run-name: {{ $task_run_name }}
+  {{- if ne $pipeline_run_name nil }}
+          ephemeralcluster.ci.openshift.io/pipeline-run-name: {{ $pipeline_run_name }}
+  {{- end }}
+{{- end }}
       spec:
         ciOperator: {{ .observed.composite.resource.spec.ciOperator|toPrettyJson }}
 {{- if hasKey .observed.composite.resource.spec "tearDownCluster" }}
