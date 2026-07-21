@@ -2,6 +2,9 @@
 apiVersion: ci.openshift.org/v1alpha1
 kind: TestPlatformCluster
 metadata:
+  annotations:
+    ephemeralcluster.ci.openshift.io/pipeline-run-name: foo
+    ephemeralcluster.ci.openshift.io/task-run-name: bar
   name: tp-aws-cluster
 spec:
   ciOperator:
