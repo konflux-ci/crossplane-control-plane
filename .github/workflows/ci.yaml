@@ -19,7 +19,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
 
       - name: Run kustomize build
         id: kube-linter-action-scan
@@ -35,7 +35,7 @@ jobs:
         run: mkdir -p ../results
 
       - name: Scan with kube-linter
-        uses: stackrox/kube-linter-action@v1.0.7
+        uses: stackrox/kube-linter-action@87802a2f4e01abebb3ee3c67a3002fea71f6eae5  # v1.0.7
         with:
           directory: manifests
           format: sarif
@@ -43,7 +43,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload SARIF report files to GitHub
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3  # v4
 
       # Ensure the workflow eventually fails if files did not pass kube-linter checks.
       - name: Verify kube-linter-action succeeded
@@ -67,10 +67,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc  # v1
 
       - name: Deploy
         shell: bash
