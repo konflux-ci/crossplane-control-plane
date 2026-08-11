@@ -4,7 +4,7 @@ kind: Kustomization
 helmCharts:
   - name: crossplane-helm
     repo: oci://quay.io/konflux-ci/crossplane-components
-    version: 0.1.249+477aa57
+    version: 0.1.251+0655468
     releaseName: crossplane
     namespace: crossplane-system
     valuesFile: values.yaml
