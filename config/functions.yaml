@@ -42,7 +42,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: quay.io/konflux-ci/crossplane-components/function-patch-and-transform@sha256:7ec6ad7d3d1c367342b3f60416331a3c05bf5e7db15727b0fabf70712390fe01
+  package: quay.io/konflux-ci/crossplane-components/function-patch-and-transform@sha256:7c8381ae0e9577f995ae6d92b3a045d876e07975cbed191804f9161198da1b49
   runtimeConfigRef:
     name: function-runtime-config
 
