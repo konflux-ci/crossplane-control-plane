@@ -44,3 +44,9 @@ See [here](./examples/xtestplatformcluster/) for an example claim or run a test 
 ./scripts/test-xtestplatformcluster.sh
 ```
 
+# Development
+
+Validate on a Kubernetes cluster (same as CI): `./scripts/deploy.sh`, then
+`./scripts/test-xnamespaces.sh` and `./scripts/test-xtestplatformcluster.sh`.
+See [Getting Started](#getting-started) for deploy prerequisites.
+
