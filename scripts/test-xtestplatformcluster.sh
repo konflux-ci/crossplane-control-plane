@@ -68,6 +68,8 @@ status:
   conditions:
   - type: ClusterReady
     status: "True"
+    reason: ClusterReady
+    message: Simulated cluster is ready
     lastTransitionTime: "2025-05-28T12:12:12Z"
 EOF
 
