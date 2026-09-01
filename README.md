@@ -16,6 +16,8 @@ It also deploys some example ProviderConfigs and RBAC configuration necessary to
 Refer to the [provider-kubernetes-in-cluster](./examples/provider-kubernetes-in-cluster/) example to
 learn about these prerequisites.
 
+**Warning:** Do not run `deploy.sh` or apply manifests under `examples/` in a production environment.
+
 All resources can be removed using the cleanup script.
 
 ```bash
