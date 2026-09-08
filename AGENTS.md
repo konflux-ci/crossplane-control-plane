@@ -32,6 +32,20 @@ Repo-specific skills live in `skills/`, symlinked for Claude Code (`.claude/skil
 
 - [adding-xrd-composition](skills/adding-xrd-composition/SKILL.md) — checklist for new XRDs, compositions, templates, examples, and test scripts
 
+## Single-file verification
+
+After a small change, lint YAML and syntax-check shell for the **files you edited**.
+
+1. Install `yamllint` if it is not on PATH.
+2. Run `yamllint <yaml-file>` and `bash -n <script>`.
+
+Example (replace the paths with the files you changed):
+
+```bash
+yamllint config/xnamespace/composition.yaml
+bash -n scripts/deploy.sh
+```
+
 ## Verifying Changes
 
 All tests require a kubernetes cluster. There are no unit tests.
