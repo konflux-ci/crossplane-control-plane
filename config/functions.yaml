@@ -66,6 +66,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: quay.io/konflux-ci/crossplane-components/function-auto-ready@sha256:1763a2ff49f8ce0e7f91e6ce15286d109fee38b34835867d06bddb45201fc8d0
+  package: quay.io/konflux-ci/crossplane-components/function-auto-ready@sha256:51513dea74552535c567f916040396fadef82c909624c243030d71e6fc7d5874
   runtimeConfigRef:
     name: function-runtime-config
