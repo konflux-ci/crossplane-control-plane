@@ -56,6 +56,12 @@
         "kustomize"
       ],
       "enabled": false
+    },
+    {
+      "matchPackagePrefixes": [
+        "quay.io/konflux-ci/crossplane-components"
+      ],
+      "groupName": "crossplane-components digest updates"
     }
   ]
 }
