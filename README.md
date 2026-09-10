@@ -12,6 +12,11 @@ The quickest way to get started is to run the `deploy.sh` script.
 This deploys crossplane from a helm chart, all necessary providers and functions, and our XRD
 configuration to a kubernetes/OpenShift cluster.
 
+The Crossplane RBAC manager is disabled because it requires cluster-admin-equivalent
+permissions. Static controller and provider permissions are maintained in
+`crossplane/rbac.yaml` and `config/provider-kubernetes.yaml`; update them whenever
+an XRD or provider API is added.
+
 It also deploys some example ProviderConfigs and RBAC configuration necessary to test the compositions.
 Refer to the [provider-kubernetes-in-cluster](./examples/provider-kubernetes-in-cluster/) example to
 learn about these prerequisites.
@@ -51,4 +56,3 @@ See [here](./examples/xtestplatformcluster/) for an example claim or run a test 
 Validate on a Kubernetes cluster (same as CI): `./scripts/deploy.sh`, then
 `./scripts/test-xnamespaces.sh` and `./scripts/test-xtestplatformcluster.sh`.
 See [Getting Started](#getting-started) for deploy prerequisites.
-

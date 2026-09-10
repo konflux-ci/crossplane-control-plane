@@ -1,0 +1,84 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: crossplane-static-extensions
+rules:
+  # The Crossplane composition engine creates and observes provider-kubernetes
+  # managed resources.
+  - apiGroups:
+      - kubernetes.crossplane.io
+    resources:
+      - objects
+      - objects/status
+      - observedobjectcollections
+      - observedobjectcollections/status
+      - providerconfigs
+      - providerconfigs/status
+      - providerconfigusages
+      - providerconfigusages/status
+    verbs:
+      - "*"
+  - apiGroups:
+      - kubernetes.m.crossplane.io
+    resources:
+      - clusterproviderconfigs
+      - clusterproviderconfigs/status
+      - objects
+      - objects/status
+      - observedobjectcollections
+      - observedobjectcollections/status
+      - providerconfigs
+      - providerconfigs/status
+      - providerconfigusages
+      - providerconfigusages/status
+    verbs:
+      - "*"
+  # Crossplane reconciles the composite and claim APIs defined by this
+  # repository's XRDs.
+  - apiGroups:
+      - eaas.konflux-ci.dev
+    resources:
+      - namespaces
+      - namespaces/status
+      - xnamespaces
+      - xnamespaces/status
+    verbs:
+      - "*"
+  - apiGroups:
+      - eaas.konflux-ci.dev
+    resources:
+      - namespaces/finalizers
+      - xnamespaces/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - ci.openshift.org
+    resources:
+      - testplatformclusters
+      - testplatformclusters/status
+      - xtestplatformclusters
+      - xtestplatformclusters/status
+    verbs:
+      - "*"
+  - apiGroups:
+      - ci.openshift.org
+    resources:
+      - testplatformclusters/finalizers
+      - xtestplatformclusters/finalizers
+    verbs:
+      - update
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: crossplane-static-extensions
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: crossplane-static-extensions
+subjects:
+  - kind: ServiceAccount
+    name: crossplane
+    namespace: crossplane-system

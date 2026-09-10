@@ -42,3 +42,109 @@ spec:
               args:
                 - '--sanitize-secrets'
                 - '--enable-watches'
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: provider-kubernetes-system
+rules:
+  # These are the provider-owned cluster-scoped APIs.
+  - apiGroups:
+      - kubernetes.crossplane.io
+    resources:
+      - objects
+      - objects/status
+      - observedobjectcollections
+      - observedobjectcollections/status
+      - providerconfigs
+      - providerconfigs/status
+      - providerconfigusages
+      - providerconfigusages/status
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - kubernetes.crossplane.io
+    resources:
+      - objects/finalizers
+      - observedobjectcollections/finalizers
+      - providerconfigs/finalizers
+      - providerconfigusages/finalizers
+    verbs:
+      - update
+  # These are the provider-owned namespaced APIs.
+  - apiGroups:
+      - kubernetes.m.crossplane.io
+    resources:
+      - clusterproviderconfigs
+      - clusterproviderconfigs/status
+      - objects
+      - objects/status
+      - observedobjectcollections
+      - observedobjectcollections/status
+      - providerconfigs
+      - providerconfigs/status
+      - providerconfigusages
+      - providerconfigusages/status
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - kubernetes.m.crossplane.io
+    resources:
+      - clusterproviderconfigs/finalizers
+      - objects/finalizers
+      - observedobjectcollections/finalizers
+      - providerconfigs/finalizers
+      - providerconfigusages/finalizers
+    verbs:
+      - update
+  # Crossplane grants these permissions to every provider controller for
+  # credentials, connection details, leader election, and events.
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - events
+      - secrets
+    verbs:
+      - "*"
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - "*"
+  # provider-kubernetes advertises the SafeStart capability and reads CRDs to
+  # determine when its APIs are established.
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - get
+      - list
+      - watch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: provider-kubernetes-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: provider-kubernetes-system
+subjects:
+  - kind: ServiceAccount
+    name: provider-kubernetes
+    namespace: crossplane-system

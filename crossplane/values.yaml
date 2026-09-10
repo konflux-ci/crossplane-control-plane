@@ -4,8 +4,7 @@ replicas: 1
 leaderElection: false
 
 rbacManager:
-  replicas: 1
-  leaderElection: false
+  deploy: false
 
 image:
   repository: quay.io/konflux-ci/crossplane-components@sha256:4bd36cb3093cf31bc4212bf2366024652dcdb12933d5fb41ea185a85d61bdcf7
@@ -20,11 +19,6 @@ function:
   packages: []
 
 securityContextCrossplane:
-  runAsNonRoot: true
-  runAsUser: null
-  runAsGroup: null
-
-securityContextRBACManager:
   runAsNonRoot: true
   runAsUser: null
   runAsGroup: null

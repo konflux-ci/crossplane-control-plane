@@ -11,6 +11,7 @@ helmCharts:
 
 resources:
   - namespaces.yaml
+  - rbac.yaml
 
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "-1"
