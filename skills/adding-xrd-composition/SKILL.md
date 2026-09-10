@@ -23,6 +23,7 @@ Copy and track progress:
 - [ ] config/<name>/composition.yaml
 - [ ] config/<name>/kustomization.yaml
 - [ ] config/<name>/templates/*.yaml
+- [ ] crossplane/rbac.yaml — grant the Crossplane controller access to the composite and claim APIs
 - [ ] config/functions.yaml — volumeMount + volume on DeploymentRuntimeConfig
 - [ ] config/kustomization.yaml — add config/<name>/
 - [ ] examples/<name>/ (claim.yaml and any prerequisite manifests)
@@ -88,6 +89,10 @@ volumes:
 
 Add `- <name>/` under `resources:` (alongside `xnamespace/`, `xtestplatformcluster/`).
 
+Also add the XRD's composite and claim resources, status subresources, and
+finalizers to `crossplane/rbac.yaml`. The RBAC manager is disabled, so Crossplane
+cannot reconcile a new XRD API until its static permissions are present.
+
 ## Step 4: Examples
 
 Create `examples/<name>/` using the **claim** kind from the XRD `claimNames` (not the composite kind). Match `metadata.name` to what the test script expects.
@@ -150,3 +155,4 @@ Observed from this repo's existing XRDs and test scripts:
 | Forgot `config/kustomization.yaml` | Add `- <name>/` under `resources:` or the XRD is never deployed | `config/kustomization.yaml` |
 | Test uses composite kind | Examples and tests use claim kind/plural from XRD `claimNames` | `config/xnamespace/xrd.yaml` vs `examples/xnamespace/claim.yaml` |
 | Missing `disableNameSuffixHash` | Set `generatorOptions.disableNameSuffixHash: true` or ConfigMap name drift breaks volume refs | `config/xnamespace/kustomization.yaml`, `config/xtestplatformcluster/kustomization.yaml` |
+| Missing static XRD RBAC | Add composite, claim, status, and finalizer rules to `crossplane/rbac.yaml` | `crossplane/rbac.yaml` |
