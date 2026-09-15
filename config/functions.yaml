@@ -42,7 +42,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: quay.io/konflux-ci/crossplane-components/function-patch-and-transform@sha256:5310e2a9be22ab7ae7d7a4416fac9f9fab0c51989fb063323af86876372dbb84
+  package: quay.io/konflux-ci/crossplane-components/function-patch-and-transform@sha256:6f29d8d49e4de9ee7e3160259975ce208d32431cf0a62c673066fbda901d7476
   runtimeConfigRef:
     name: function-runtime-config
 
@@ -54,7 +54,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: quay.io/konflux-ci/crossplane-components/function-go-templating@sha256:a267ec19df58584ebf1e90e096b34bb4fd89cbeca57c8874beb295f9c93b0a87
+  package: quay.io/konflux-ci/crossplane-components/function-go-templating@sha256:6cb63a368a30a546964a8f832a90749278a666d34e0080f396fc82a2892b26b4
   runtimeConfigRef:
     name: function-runtime-config
 
@@ -66,6 +66,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: quay.io/konflux-ci/crossplane-components/function-auto-ready@sha256:a305ce38f1e110e5c78858d6369005a502a984c43f62ef4f2443cf4ab5d687ac
+  package: quay.io/konflux-ci/crossplane-components/function-auto-ready@sha256:088585d99c6adb958a3857401bbde46d523fc702d61e1d48463a333d056b785f
   runtimeConfigRef:
     name: function-runtime-config
