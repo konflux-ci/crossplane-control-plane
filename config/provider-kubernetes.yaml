@@ -13,7 +13,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  package: quay.io/konflux-ci/crossplane-components/provider-kubernetes@sha256:d502631dd2bade1193845d965a484f7a38888a61f4ddd716fc18761146c99398
+  package: quay.io/konflux-ci/crossplane-components/provider-kubernetes@sha256:2fd32bcd755dee74b6c6a55f2285ba76c437cb729b1091232c65e9f365a08619
   runtimeConfigRef:
     name: provider-kubernetes-runtime-config
 
