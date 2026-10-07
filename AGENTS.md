@@ -32,6 +32,7 @@ and compositions for use within Konflux.
 Repo-specific skills live in `skills/`, symlinked for Claude Code (`.claude/skills`) and Cursor (`.cursor/skills`).
 
 - [adding-xrd-composition](skills/adding-xrd-composition/SKILL.md) — checklist for new XRDs, compositions, templates, examples, and test scripts
+- [retro-filing-policy](skills/retro-filing-policy/SKILL.md) — Retro output (PR close or `/fs-retro`). Keep `proposals` empty unless the human comment explicitly says to file issues.
 
 ## Single-file verification
 
