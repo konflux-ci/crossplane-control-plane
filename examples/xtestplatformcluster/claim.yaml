@@ -21,6 +21,7 @@ spec:
       clusterProfile: aws
       env:
         foo: bar
+      waitForTearDownTimeout: 4h
       workflow: ipi-aws
   writeConnectionSecretToRef:
     name: aws-cluster-kubeconfig
