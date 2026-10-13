@@ -30,8 +30,8 @@ wait_until_exists() {
 }
 
 # Install the EphemeralCluster CRD
-ephemeralcluster_crd='https://raw.githubusercontent.com/openshift/ci-tools/refs/heads/main/pkg/api/ephemeralcluster/v1/ci.openshift.io_ephemeralclusters.yaml'
-curl -sSL "$ephemeralcluster_crd" | kubectl apply -f -
+ephemeralcluster_crd="${EPHEMERALCLUSTER_CRD:-https://raw.githubusercontent.com/openshift/ci-tools/refs/heads/main/pkg/api/ephemeralcluster/v1/ci.openshift.io_ephemeralclusters.yaml}"
+kubectl apply -f "$ephemeralcluster_crd"
 kubectl wait crd/"$ec_group" --for=condition=Established=true --for=condition=NamesAccepted=true
 
 kubectl apply -f "$ROOT"/examples/xtestplatformcluster/namespaces.yaml
@@ -46,6 +46,16 @@ ephemeralcluster="$(kubectl get $xr_group -l "$claim_label" -o jsonpath='{.items
 credentials_obj="objects.kubernetes.crossplane.io/credentials-${ephemeralcluster}"
 
 wait_until_exists -n ephemeral-cluster "$ec_group/$ephemeralcluster"
+
+# Make sure the timeout survives the claim and composite schemas and reaches the EphemeralCluster.
+for resource in "$claim_group/$claim_name" "$xr_group/$ephemeralcluster"; do
+    kubectl wait "$resource" \
+        --for=jsonpath='{.spec.ciOperator.test.waitForTearDownTimeout}'=4h \
+        --timeout="$wait_timeout"
+done
+kubectl -n ephemeral-cluster wait "$ec_group/$ephemeralcluster" \
+    --for=jsonpath='{.spec.ciOperator.test.waitForTearDownTimeout}'=4h \
+    --timeout="$wait_timeout"
 
 # Simulate what the EphemeralCluster controller does: create a credentials Secret and set secretRef in the EphemeralCluster status.
 test_kubeconfig=$(cat "$ROOT/scripts/testdata/test-kubeconfig.yaml")

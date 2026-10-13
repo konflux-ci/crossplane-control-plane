@@ -11,3 +11,12 @@ Version: v0.17.0
 
 $ controller-gen crd paths=./pkg/api/ephemeralcluster/v1 output:crd:dir=./pkg/api/ephemeralcluster/v1
 ```
+
+The optional `spec.ciOperator.test.waitForTearDownTimeout` field specifies how long to wait for the tearDown signal before automatically deprovisioning the cluster. It accepts durations such as `4h` or `2h30m`; omitting it preserves the default of `2h`.
+
+The integration test uses the ci-tools CRD from `main` by default. To test changes before they reach `main`, set `EPHEMERALCLUSTER_CRD` to a local CRD path or URL:
+
+```sh
+EPHEMERALCLUSTER_CRD=../ci-tools/pkg/api/ephemeralcluster/v1/ci.openshift.io_ephemeralclusters.yaml \
+  ./scripts/test-xtestplatformcluster.sh
+```
