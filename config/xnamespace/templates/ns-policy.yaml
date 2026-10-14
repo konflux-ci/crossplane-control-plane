@@ -38,7 +38,7 @@ spec:
           # builds
           count/buildconfigs.build.openshift.io: "0"
           # other
-          count/clustertemplateinstances.clustertemplate.openshift.io: "5"
+          count/clustertemplateinstances.clustertemplate.openshift.io: "0"
   providerConfigRef:
     name: eaas-kubernetes-provider-config
 
