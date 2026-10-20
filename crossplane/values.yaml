@@ -7,7 +7,7 @@ rbacManager:
   deploy: false
 
 image:
-  repository: quay.io/konflux-ci/crossplane-components@sha256:01cae6d602e2712a81517e811ffcc80d7cab689974e93d7e892c6aad9d73351e
+  repository: quay.io/konflux-ci/crossplane-components@sha256:fc1e31fcd1d4a5a29776fec44e6fe18ea684d0a67027aca3e642da6885452ded
   tag: ""
   ignoreTag: true
   pullPolicy: IfNotPresent
